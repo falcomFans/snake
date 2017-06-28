@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        var food;
+        var snake;
+        var map;
+        function Map() {
+            this.width = 64 * 24;
+            this.height = 64 * 14;
+            this.color = "#4ECC2B";
+            this.position = "absolute";
+            this._map = null;
+            this._text = null;
+            this.show = function () {
+                this._map = document.createElement("div");
+                this._map.style.width = this.width + "px";
+                this._map.style.height = this.height + "px";
+                this._map.style.backgroundColor = this.color;
+                this._map.style.position = this.position;
+                this._map.style.left = 0;
+                this._map.style.top = 0;
+                document.getElementsByTagName("body")[0].appendChild(this._map);
+            }
+        }
+        function Food() {
+            this.position = "absolute";
+            this.img = null;
+            this.x = 0;
+            this.y = 0;
+            this.show = function () {
+                if(this.img == null){
+                    this.img = document.createElement("img");
+                    this.img.src = "./TIM.png";
+                    this.img.style.position = this.position;
+                }    
+                this.x = Math.floor(Math.random() * 24) ;
+                this.img.style.left = this.x * 64 + "px";
+                this.y = Math.floor(Math.random() * 14)  ;
+                this.img.style.top = this.y * 64 + "px";
+                map._map.appendChild(this.img); 
+            }
+        }
+        function Snake() {
+            this.direction = "right";
+            this.position = "absolute";
+            this.body = [[4,2,null],[3,2,null],[2,2,null]];
+            this.show =function(){
+                for (var index = 0; index < this.body.length; index++) {
+                    var element = this.body[index];
+                    if (element[3]==null) {
+                        element[3] = document.createElement("img");
+                        element[3].src = "./TIM.png";
+                        element[3].style.position = this.position;
+                    }
+                    element[3].style.left =element[0] * 64 + "px";
+                    element[3].style.top =element[1] * 64 + "px";
+                    map._map.appendChild(element[3]);
+                }
+            }
+            this.move =function(){
+                if(this.body[0][0] == food.x && this.body[0][1] == food.y) {
+                    this.body.push([0,0,null]);
+                    food.show();
+			    }
+                var length =this.body.length;
+                for (var index = length - 1; index > 0; index--) {
+                    var element = this.body[index];
+                    var element2 = this.body[index-1];
+                    element[0] = element2[0];
+                    element[1] = element2[1];
+                }
+                switch (this.direction) {
+                    case "right":                  
+                        this.body[0][0] += 1;
+                        if(this.body[0][0] == 24){
+                            this.body[0][0] = 0;
+                        }
+                        if(this.body[0][0] == food.x){
+                            this.setDirection(38)
+                        }
+                        break;
+                    case "left":
+                        
+                        this.body[0][0] -= 1;
+                        if(this.body[0][0] == -1){
+                            this.body[0][0] = 23;
+                        }
+                        if(this.body[0][0] == food.x){
+                            this.setDirection(38)
+                        }
+                        break;
+                    case "up":
+                        
+                        this.body[0][1] -= 1;
+                        if(this.body[0][1] == -1){
+                            this.body[0][1] = 13;
+                        }
+                        if(this.body[0][1] == food.y){
+                            this.setDirection(39)
+                        }       
+                        break;
+                    case "down":
+                        this.body[0][1] += 1;
+                        if(this.body[0][1] == 14){
+                            this.body[0][1] = 0;  
+                        }
+                        if(this.body[0][1] == food.y){
+                            this.setDirection(39)
+                        }          
+                        break;
+                    default:
+                        break;
+                }
+                this.show();
+            }
+            this.setDirection=function(keycode){
+                switch (keycode) {
+                    case 37:
+                        this.direction = 'left';
+                        break;
+                    case 38:
+                        this.direction = 'up';
+                        break;
+                    case 39:
+                        this.direction = 'right';
+                        break;
+                    case 40:
+                        this.direction = 'down';
+                        break;
+                }
+            }    
+        }
+        window.onload = function () {
+            map = new Map();
+            map.show();
+            food  = new Food();
+            food.show();
+            snake =new Snake();
+            snake.show();
+            setInterval("snake.move()",200);
+            window.document.onkeydown=function(){
+                var code;
+                code = event ? event.keyCode :window.event.keyCode;
+                snake.setDirection(code);
+            }
+        }
+    </script>
+</body>
+</html>
